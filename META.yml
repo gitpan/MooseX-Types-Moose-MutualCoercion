@@ -35,4 +35,4 @@ resources:
   homepage: http://github.com/gardejo/p5-moosex-types-moose-mutualcoercion
   license: http://dev.perl.org/licenses/
   repository: git://github.com/gardejo/p5-moosex-types-moose-mutualcoercion.git
-version: 0.00
+version: 0.01
