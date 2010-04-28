@@ -35,7 +35,7 @@ use MooseX::Types -declare => [qw(
     ArrayRefToRegexpRef
 )];
 use MooseX::Types::Common::String qw(
-    NonEmptySimpleStr
+    NonEmptyStr
 );
 use MooseX::Types::Moose qw(
     Str
@@ -55,7 +55,7 @@ use MooseX::Types::Moose qw(
 # public class variable(s)
 # ****************************************************************
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 
 # ****************************************************************
@@ -117,7 +117,7 @@ subtype StrToClassName,
     #     };
 
 coerce StrToClassName,
-    from NonEmptySimpleStr,
+    from NonEmptyStr,
         via {
             _ensure_class_loaded($_);
         };
@@ -132,7 +132,7 @@ coerce StrToClassName,
 #     as RoleName;
 # 
 # coerce StrToRoleName,
-#     from NonEmptySimpleStr,
+#     from NonEmptyStr,
 #         via {
 #             _ensure_class_loaded($_);
 #         };
@@ -315,28 +315,32 @@ MooseX::Types::Moose::MutualCoercion - Mutual coercions for common type constrai
 
 This document describes
 L<MooseX::Types::Moose::MutualCoercion|MooseX::Types::Moose::MutualCoercion>
-version C<0.01>.
+version C<0.02>.
 
 =head1 SYNOPSIS
 
     {
         package Foo;
         use Moose;
-        use MooseX::Types::Moose::MutualCoercion qw(
-            StrToArrayRef ArrayRefToHashKeys
-        );
-        has 'thingies'
-            => ( is => 'rw', isa => StrToArrayRef, coerce => 1 );
-        has 'lookup_table'
-            => ( is => 'rw', isa => ArrayRefToHashKeys, coerce => 1 );
+        use MooseX::Types::Moose::MutualCoercion
+            qw(StrToArrayRef StrToClassName ArrayRefToHashKeys);
+        # use URI; # Don't repeat yourself!
+        has 'thingies' =>
+            (is => 'rw', isa => StrToArrayRef, coerce => 1);
+        has 'uri_class' =>
+            (is => 'rw', isa => StrToClassName, coerce => 1, default => 'URI');
+        has 'lookup_table' =>
+            (is => 'rw', isa => ArrayRefToHashKeys, coerce => 1);
         1;
     }
 
     my $foo = Foo->new( thingies => 'bar' );
-    print $foo->thingies->[0];                  # 'bar'
+    print $foo->thingies->[0];                              # 'bar'
 
-    $foo->lookup_table([qw(baz qux)]);
-    print 'eureka!'                             # 'eureka!'
+    print Class::MOP::is_class_loaded( $foo->uri_class );   # 1
+
+    $foo->lookup_table( [qw(baz qux)] );
+    print 'eureka!'                                         # 'eureka!'
         if grep {
             exists $foo->lookup_table->{$_};
         } qw(foo bar baz);
@@ -416,7 +420,7 @@ B<NOTE>: Also adds C<< $/ >> to the last element.
 =item C<< StrToClassName >>
 
 A subtype of C<< ClassName >>.
-If you turned C<< coerce >> on, C<< NonEmptySimpleStr >>, provided by
+If you turned C<< coerce >> on, C<< NonEmptyStr >>, provided by
 L<MooseX::Types::Common::String|MooseX::Types::Common::String>,
 will be treated as a class name.
 When it is not already loaded, it will be loaded by
