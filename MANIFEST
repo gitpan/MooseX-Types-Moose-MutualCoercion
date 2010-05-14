@@ -26,7 +26,6 @@ META.yml
 README
 t/00_basic.t
 t/lib/Test/SomeClass.pm
-t/lib/Test/SomeRole.pm
 xt/kwalitee.t
 xt/meta.t
 xt/no_tabs.t
