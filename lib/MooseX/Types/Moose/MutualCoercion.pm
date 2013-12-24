@@ -52,10 +52,20 @@ use MooseX::Types::Moose qw(
 
 
 # ****************************************************************
+# general dependency(-ies)
+# ****************************************************************
+
+use Class::Load qw(
+    load_class
+    is_class_loaded
+);
+
+
+# ****************************************************************
 # public class variable(s)
 # ****************************************************************
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 
 # ****************************************************************
@@ -265,10 +275,8 @@ coerce ArrayRefToRegexpRef,
 sub _ensure_class_loaded {
     my $class = shift;
 
-    # FIXME: I cannot load role by Class::MOP::load_class($class).
-    #        Perhaps role must be consumed by some class?
-    Class::MOP::load_class($class)
-        unless Class::MOP::is_class_loaded($class);
+    load_class($class)
+        unless is_class_loaded($class);
 
     return $class;
 }
@@ -296,7 +304,7 @@ MooseX::Types::Moose::MutualCoercion - Mutual coercions for common type constrai
 
 This document describes
 L<MooseX::Types::Moose::MutualCoercion|MooseX::Types::Moose::MutualCoercion>
-version C<0.03>.
+version C<0.04>.
 
 =head1 SYNOPSIS
 
@@ -406,7 +414,7 @@ If you turned C<< coerce >> on, C<< NonEmptyStr >>, provided by
 L<MooseX::Types::Common::String|MooseX::Types::Common::String>,
 will be treated as a class name.
 When it is not already loaded, it will be loaded by
-L<< Class::MOP::load_class()|Class::MOP >>.
+L<< Class::Load::load_class()|Class::Load >>.
 
 =back
 
